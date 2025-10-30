@@ -6,6 +6,7 @@ import Loader from "../Components/Loader";
 import { useCategory } from "../Contexts/useCategory";
 import { useSearch } from "../Contexts/useSearch";
 import LoadingSpinner from "../Components/LoadingSpinner";
+import { netlifyFetchFilteredNews, netlifyFetchNews } from "../../netlify/function/news";
 
 export default function Home() {
   const [category] = useContext(useCategory);
@@ -21,27 +22,31 @@ export default function Home() {
   const [openSearch] = useContext(useSearch);
 
   function fetchNews() {
-    return fetch(
-      `https://newsapi.org/v2/top-headlines?country=us&category=${category}&pageSize=10&apiKey=${
-        import.meta.env.VITE_NEWS_API_KEY
-      }`
-    )
-      .then((res) => res.json())
-      .then((data) => data.articles);
+    // return fetch(
+    //   `https://newsapi.org/v2/top-headlines?country=us&category=${category}&pageSize=10&apiKey=${
+    //     import.meta.env.VITE_NEWS_API_KEY
+    //   }`
+    // )
+    //   .then((res) => res.json())
+    //   .then((data) => data.articles);
+
+    return netlifyFetchNews(category).then((res) => JSON.parse(res.body).articles);
   }
 
   function fetchFilteredNews() {
-    return fetch(
-      `https://newsapi.org/v2/everything?q=${searchQuery
-        .trim()
-        .toLowerCase()}&pageSize=10&apiKey=${import.meta.env.VITE_NEWS_API_KEY}`
-    )
-      .then((res) => res.json())
-      .then((data) => data.articles)
-      .catch((err) => {
-        console.log("Error fetching news according to headline: ", err);
-        return err;
-      });
+    // return fetch(
+    //   `https://newsapi.org/v2/everything?q=${searchQuery
+    //     .trim()
+    //     .toLowerCase()}&pageSize=10&apiKey=${import.meta.env.VITE_NEWS_API_KEY}`
+    // )
+    //   .then((res) => res.json())
+    //   .then((data) => data.articles)
+    //   .catch((err) => {
+    //     console.log("Error fetching news according to headline: ", err);
+    //     return err;
+    //   });
+
+    return netlifyFetchFilteredNews(searchQuery).then((res) => JSON.parse(res.body).articles);
   }
 
   useEffect(() => {
